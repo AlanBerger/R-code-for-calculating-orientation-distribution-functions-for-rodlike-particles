@@ -1,10 +1,14 @@
 # R-code-for-calculating-orientation-distribution-functions-for-rodlike-particles
-R code for calculating orientation distribution functions for rodlike particles using successive substitution and trapezoidal numerical integration as in Herzfeld Berger Wingate - Macromolecules 1984
+
+R code for calculating orientation distribution functions for rodlike particles 
+using successive substitution and trapezoidal numerical integration as 
+in Herzfeld, Berger, Wingate, Macromolecules 1984, v17, 1718-1723, 
+https://pubs.acs.org/doi/pdf/10.1021/ma00139a014
 
 README for the GitHub repository
 R-code-for-calculating-orientation-distribution-functions-for-rodlike-particles
 
-Alan E. Berger December 3, 2023
+Alan E. Berger December 30, 2023
 
 The R code provided here uses the iterative method indicated by 
 the calculus of variations, discretized 
@@ -13,7 +17,14 @@ for Computing the Orientation Distribution Functions of Rodlike Particles,
 Macromolecules 1984, v17, 1718-1723, [HBW 1984], 
 to calculate approximations to Orientation Distribution Functions 
 
+Note also
+
+R. F. Kayser Jr. and H. J. Raveche', Bifurcation in Onsager's model of the 
+isotropic-nematic transition, Physical Review A 1978, v17, 2067-2072 [KR 1978]
+
+
 abbreviation used below: ODF is orientation distribution function
+
 
 The code provided in this repository is generally using the notation and 
 setup in the Judith Herzfeld, Alan E. Berger and John W. Wingate paper,
@@ -25,17 +36,18 @@ over running speed). Also, rather than use Richardson extrapolation as done in
 intent is to simply use larger numbers of grid points to obtain desired accuracy. 
 
 The R function  compute_approx_ODF(N.theta.intervals, N.phi.intervals, W)  
-uses the lexical scoping and function closure properties of the R programming 
-language to do once, various setup calculations, and then have those results available. 
-compute_approx_ODF then defines and returns the function   
-calculate_ODF(initial.f, B, tau.conv, max.num.iter, min.iterations)    
-that for a given value of the constant B in the free energy function F, and initial 
+uses the function closure properties of the R programming 
+language to do once, various setup calculations, and then have those results  
+available to the function 
+calculate_ODF(initial.f, B, tau.conv, max.num.iter, min.iterations)  
+that compute_approx_ODF defines and returns. 
+For a given value of the constant B in the free energy function F, and initial 
 vector of values initial.f at the  grid points {Pj = j * pi / N.theta.intervals}, 
-j = 1, 2, ..., N.theta.intervals - 1),
+j = 1, 2, ..., N.theta.intervals - 1, the function calculate_ODF 
 calculates an approximate ODF f (a vector of values {fj} approximating the values
 of an ODF at the grid points {Pj}). 
-f generally should approximate the values of a local minimum of F at 
-the grid points {Pj}. Convergence of the iteration is tested as in [HBW 1984], 
+f generally should approximate the values, at the grid points {Pj}, of an ODF that
+is a local minimum of F. Convergence of the iteration is tested as in [HBW 1984], 
 using as the convergence bound   tau.conv  
 
 max.num.iter is the maximum number of iterations allowed, and min.iterations
@@ -55,7 +67,7 @@ that a local minimum of the free energy will satisfy.
 The Rmd (R markdown) file  R-code-for-calculating-ODFs-and-example-runs.Rmd 
 in this repository contains the R code for
 the function  compute_approx_ODF (which returns the function calculate_ODF) 
-and R code for example runs.
+and R code that will generate output and plots for example runs.
 
 To download the Rmd file (as a text file) to get the R code,
 click on the Rmd file name in this repository, then in the display one sees, 
@@ -63,16 +75,13 @@ click on the Rmd file name in this repository, then in the display one sees,
 or in general, click on the downarrow icon (to the right of "raw") to download
 the Rmd file.
 
+If one wants to copy any of the R code, do that from the Rmd file (which is a plain text file).
+
 When this R markdown file is run through R's knitr, it produces the corresponding
-md (markdown) file that contains output from the R code including plots
-(the md file is included in this repository).
+pdf file that contains output from the R code including plots
+(the pdf file is included in this repository).
 
 Note also: 
-
-R. F. Kayser Jr. and H. J. Raveche', Bifurcation in Onsager's model of the 
-isotropic-nematic transition, Physical Review A 1978, v17, 2067-2072 [KR 1978]
-
-and 
 
 A. E. Berger, Analysis of a constrained minimization problem modeling the orientation 
 distribution of rod-like particles, Nonlinear Analysis, Theory, Methods & Applications 1987, 
@@ -86,11 +95,9 @@ gamma will be equal
 
 Trapezoidal numerical integration is used to approximate the value of 
 integrals, and the presence of sin(theta) factors in the free energy function 
-results in the values of f at the points corresponding to theta = 0 and 
+results in the values of an ODF f at the points corresponding to theta = 0 and 
 theta = pi having no effect on the value of the discretized free energy. 
-Note f (the vector of values defined at the grid points Pj) has a natural
-extension to a function defined for all theta in [0, pi]: see equation (2.8) 
-in [B 1987]; and, when W(gamma) equals sin(gamma), by Theorem 1.2 or Lemma 3.1 
+When W(gamma) equals sin(gamma), by Theorem 1.2 or Lemma 3.1 
 in [B 1987] any ODF that is a  
 local minimum of the actual (not discretized) free energy function F will 
 have (at least) 2 continuous derivatives 
