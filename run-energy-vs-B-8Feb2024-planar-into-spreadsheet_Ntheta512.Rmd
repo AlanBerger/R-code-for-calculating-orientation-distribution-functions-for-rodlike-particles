@@ -1,0 +1,165 @@
+
+---
+output: pdf_document  
+---
+
+## Run planar shaped initial ODF with multiple B for W($\gamma$) = sin($\gamma$)  8Feb2024
+
+Use same B values as for
+Run axial shaped initial ODF with multiple B for W($\gamma$) = sin($\gamma$)  8Feb2024
+
+Collect results and write out variables of interest into a tab delimited text file (view with Excel),
+one row of results for each value of B, tightly space B near points of interest,
+for example the bifurcation point at B = 32 / $\pi$ when W($\gamma$) = sin($\gamma$).
+
+Any initial orientation distribution function (ODF) $f_0$ is processed by 
+taking max(0.0001, $f_0$) (to avoid issues with $\ln$),  
+and then dividing by the constant such that $\frac{1}{2} \int_0^{\pi} f_0(\theta) \sin(\theta)\,d\theta$ is 1.
+
+The algorithm (and notation) below for calculating an approximate ODF generally follows that in 
+J. Herzfeld, A. E. Berger, J. W. Wingate, 
+A highly convergent algorithm for computing the orientation distribution functions 
+of rodlike particles, Macromolecules 1984, v17, 1718-1723, [HBW 1984], 
+while allowing for more general particle interaction kernels $W(\gamma)$, and an optional
+applied field $V(\theta)$.
+
+Start section of R code:
+
+``` {r, results = 'hide'}
+# results = 'hide' suppresses printout of results from the 
+# section of R code when knitr is run
+# here we don't need the information printouts (version of  compute_approx_ODF  for each run)
+# echo = FALSE would suppress printing the R code in the output
+
+rm(list = ls())  # clear out any "left over" variables (R objects) (usually a good idea)
+##### note rm in R is not the Unix rm that permanently removes files
+
+dirstr <- "C:/berger/orientationdistr/ODF_R_fcns"  
+# location of code for calculating ODFs on my computer
+                    
+filename <- "compute_approx_ODF_27Jan2024.R"       
+# the name of the file on my computer containing the code for compute_approx_ODF
+# this is the version that is out on GitHub
+
+full.file.name <- paste(dirstr, "/", filename, sep = "")  # the full path
+
+source(full.file.name)  # "compile" the program
+##### when this Rmd file is run through knitr, 
+##### the lines above direct that the R code for compute_approx_ODF is "compiled" 
+
+# In this code, the R function    compute_approx_ODF
+# calculates various values that only need to be calculated once;
+# and defines and returns the function   calculate_ODF 
+# which does the calculation for an ODF
+
+# the arguments of the compute_approx_ODF function are:
+
+# W(gamma) is the particle interaction kernel function
+W <- function(g) sin(g)  # the hard core reference system
+
+# V(theta) is the applied field, the default is V equal 0
+
+N.theta.intervals <- 512    # 256   
+# This is the number of equally spaced theta intervals.
+# Values of the approximate ODF that this code
+# calculates correspond to equally spaced
+# theta points inside (0, pi); due to sin(theta) factors in relevant integrals,
+# values of the ODF at 0 and pi have no effect, and are not calculated directly
+# (just for plotting, values at the endpoints 0 and pi are determined by extrapolation).
+
+N.phi.intervals <- 2048
+# this is the number of equally spaced phi intervals used by trapezoidal numerical
+# integration for determining the discrete particle interaction kernel matrix
+
+calculate_ODF <- compute_approx_ODF(N.theta.intervals, N.phi.intervals, W)  
+# The default applied field function V is V(theta) = 0, so does not 
+# need to be included in the call to  compute_approx_ODF  if don't want 
+# to have an applied field.
+
+# returns the function 
+#    calculate_ODF(initial.f, B, tau.conv, max.num.iter, min.iterations) 
+
+# initial.f is the supplied initial ODF 
+# (a vector of values at the equally spaced theta grid points inside (0, pi))
+
+# B is the positive constant factor in the particle interation term
+
+tau.conv <- 1.0e-6  # 1.0e-5  # the bound for the convergence criterion (see [HBW 1984]
+max.num.iter <- 5000  # 3000  # maximum number of iterations allowed
+min.iterations <- 10  # require having done  min.iterations  iterations before
+#                                        start testing for convergence    
+
+# define a vector of initial ODF values at the theta grid points
+delta.theta <- pi / N.theta.intervals  # length of theta subintervals
+num.theta.points <- N.theta.intervals - 1   # number of theta points inside (0, theta)
+theta.indices <- 1:num.theta.points
+theta.vec <- theta.indices * delta.theta  
+# theta values for numerical integration and values of the ODF being calculated
+
+initial.f <- sin(theta.vec) * sin(theta.vec)  # planar shaped - peak at theta = 0
+#### initial.f <- cos(theta.vec) * cos(theta.vec)  # axial shaped - peaks at theta = 0 and pi
+
+
+# form vector of B values to do runs for
+Bvec1 <- seq(from = 14.0, to = 10.8, by = -0.1)
+Bvec2 <- seq(from = 10.79, to = 10.21, by = -0.01)
+Bvec3 <- seq(from = 10.209, to = 10.171, by = -0.001)
+Bvec4 <- seq(from = 10.17, to = 10.01, by = -0.01)
+Bvec5 <- seq(from = 10., to = 9.2, by = -0.1)
+Bvec6 <- seq(from = 9.19, to = 9.02, by = -0.01)
+Bvec7 <- seq(from = 9.019, to = 8.871, by = -0.001)
+Bvec8 <- c(8.87, 8.85, 8.8, 8.7, 8.6, 8.5, 8.4, 8.3, 8.2, 8.1, 8.0)
+Bvec <- c(Bvec1, Bvec2, Bvec3, Bvec4, Bvec5, Bvec6, Bvec7, Bvec8)
+
+B <- 15  # run this, could use ODF from each previous run as the 
+# initial guess for the next run, but here want same initial value for each run
+
+
+results <- calculate_ODF(initial.f, B, tau.conv, max.num.iter, min.iterations) 
+# calculate_ODF returns a list of desired variables
+
+fnp1 <- results[[1]]  # the ODF from the last iteration of the run of  calculate_ODF  
+# could use as initial guess for next run if appropriate
+
+vector.of.values <- results[[7]]
+names.for.vector.of.values <- results[[8]]  # use this as names for data frame rows or columns
+# can print out the values in  vector.of.values  if desired, cf. the quantities 
+# in Tables I and II in [HBW 1984]
+
+# display these values using a data frame
+##df.for.values <- data.frame(names.for.vector.of.values,  vector.of.values,
+##                                                   stringsAsFactors = FALSE)
+##colnames(df.for.values) <- c("variable name", "value")
+##df.for.values
+
+# do production run for multiple B values  ####################
+
+matrix.of.results <- numeric(0)  # initialize "container" for the results
+# 1 row of values for each B, column names will use notation in [HBW 1984]
+
+for (Bv in Bvec) {
+   results <- calculate_ODF(initial.f, Bv, tau.conv, max.num.iter, min.iterations) 
+   vector.of.values <- results[[7]]
+   matrix.of.results <- rbind(matrix.of.results, vector.of.values)  # row bind
+}
+
+names.for.vector.of.values <- results[[8]]
+df.for.output <- data.frame(matrix.of.results, 
+          row.names = NULL, stringsAsFactors = FALSE)  # one row for each B
+colnames(df.for.output) <- names.for.vector.of.values
+
+outp.file.name <- "results.for.several.B.planar.ODFs.8Feb2024_Ntheta512.tab"
+# this will be a tab delimited text file (view it with Excel)
+dirstr <- "C:/berger/orientationdistr/ODF_R_fcns"   # location to place the file
+full.output.file.name <- paste(dirstr, "/", outp.file.name, sep = "")
+
+#  call to write.table below to write out the file
+# as a tab ("\t") delimited text file (view with Excel)
+
+write.table(df.for.output, file = full.output.file.name, 
+           append = FALSE, quote = FALSE, sep = "\t",
+           row.names = FALSE, col.names = TRUE)
+```
+
+## Have obtained results for the selected values of B
+
