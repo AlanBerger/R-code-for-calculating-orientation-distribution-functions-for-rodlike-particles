@@ -4,7 +4,7 @@ README for the GitHub repository
 R-code-for-calculating-orientation-distribution-functions-for-rodlike-particles
 in the GitHub site:  https://github.com/AlanBerger/   
 
-Last revision of this README: June 11, 2024
+Last revision of this README: November 12, 2024  previous revision: June 11, 2024
 
 This repository contains R code for calculating orientation distribution functions
 for rodlike particles using successive substitution and trapezoidal numerical integration as 
@@ -20,7 +20,8 @@ and an optional applied field V(theta).
 Note also
 
 R. F. Kayser Jr. and H. J. Raveche', Bifurcation in Onsager's model of the 
-isotropic-nematic transition, Physical Review A 1978, v17, 2067-2072 
+isotropic-nematic transition, Physical Review A 1978, v17, 2067-2072,
+https://journals.aps.org/pra/abstract/10.1103/PhysRevA.17.2067 
 [KR 1978]
 
 ## abbreviation used below: ODF is orientation distribution function. 
@@ -37,13 +38,16 @@ and for more general W(gamma), including W not satisfying W(pi - gamma) = W(gamm
 so calculations are done on theta in [0, pi] rather than assuming symmetry about pi/2 
 
 Examples of using the functions in: compute_approx_ODF_27Jan2024.R  
-are also contained in this GitHub repository, showing how figures in the manuscript:
+are also contained in this GitHub repository, showing how figures were generated for the paper:
 
 Alan E. Berger, Conditions under which a natural iterative method for calculating the 
-orientation distribution of rodlike particles decreases the free energy at each step, May 29, 2024
-[Berger, 2024, submitted]
+orientation distribution of rodlike particles decreases the free energy at each step,
+Physical Chemistry Chemical Physics 2024, v26, 23893-23909, 
+https://pubs.rsc.org/en/content/articlelanding/2024/cp/d4cp02217c  (open access),
+[Berger 2024]
+part of the themed collection: Festschrift for Judith Herzfeld
+https://pubs.rsc.org/en/journals/articlecollectionlanding?sercode=cp&themeid=8cf9a895-0019-4ac1-8012-8a0549fb4212  
 
-were generated.
 
 Current computing power relative
 to that in 1984 means that for these calculations one can favor simpler code 
@@ -105,11 +109,11 @@ max.num.iter is the maximum number of iterations allowed, and min.iterations
 is the number of iterations to be done before testing for convergence.
 
 W(gamma) is the function in the particle interaction term integral in the free energy 
-function F (see [HBW 1984] for definitions and notation). The code here allows for
+function F (see [HBW 1984], [Berger 2024] for definitions and notation). The code here allows for
 more general functions W and an applied field V(theta).
 Under appropriate conditions* on W, the iteration
 as applied to continuous ODFs strictly decreases the free energy at each step 
-(unless one was at a fixed point of the iteration) [Berger, 2024, submitted].
+(unless one was at a fixed point of the iteration) [Berger, 2024].
 This result has strong implications for 
 convergence of the sequence or a sub-sequence of the iterations 
 to a solution of the equation, given by the calculus of variations, 
@@ -126,7 +130,7 @@ and contains R code that will generate output and plots for example runs.
 
 Its output (the corresponding PDF file) is also in this repository.
 
-## Note ([Berger, 2024, submitted]):
+## Note ([Berger, 2024]):
 
 If W(pi - gamma) = - W(gamma), and V = 0, and
 the initial value f0 for the ODF to start the iteration
@@ -147,6 +151,13 @@ In general, one should use several
 different initial ODFs to start the iteration, (including initial ODFs that are 
 not symmetric about theta = pi / 2) to have a better chance of finding
 all relevant local minima of the free energy. 
+
+Note that ***local minimum*** here refers to a local minimum over the set of axisymmetric 
+orientation distribution functions. There can be local minima over the set of axisymmetric 
+orientation distribution functions that are not local minima with respect to the set of
+all orientation distribution functions (for a detailed discussion see the first paragraph of
+Section 2.3, the paragraph below equation (12), the paragraph before Section 3.4.2, and the  
+discussion of Figure 2 and Figure 6 in [Berger 2024].
 
 Rmd files that generate tables of values of quantities of interest for 
 many values of B (1 row for each value of B) for the hard core
@@ -171,7 +182,7 @@ it produces the corresponding
 PDF file that contains output from the R code including plots if present 
 (and tab delimited output text files if coded for)
 (the pdf file will be included in this repository for the Rmd files that generated
-plots for [Berger, 2024, submitted]). 
+plots for [Berger, 2024]). 
 
 
 For the hard core reference system, the function W in the free energy function
@@ -181,7 +192,7 @@ w_m <= 0 for m > 0 and sum |w_m| is finite ([KR 1978]).
 gamma is the angle between two spherical coordinates (theta1, phi1) and (theta2, phi2),
 which by the law of cosines equals
     acos(sin(theta1) * sin(theta2) * cos(phi1 - phi2) + cos(theta1) * cos(theta2))
-(see for example [KR 1978], [Berger, 2024, submitted]).
+(see for example [KR 1978], [Berger, 2024]).
 (Rather than using Greek symbols, I am using variable names that are in the R code.)
 
 Trapezoidal numerical integration is used to approximate the value of 
